@@ -1,0 +1,6 @@
+So I've got a pretty rudimentary way of getting the 
+data for calibration working. I may or may not change
+the organizational structure of it (i.e. merging into
+the bot class or creating a new gui module and merging
+it with that. The use of global variables is also
+something I'll be thinking about.)
