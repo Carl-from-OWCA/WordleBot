@@ -1,4 +1,5 @@
 from pynput import mouse, keyboard
+from PIL import ImageGrab
 
 # Global variables for the module
 clickLog: list[tuple] = []
@@ -7,10 +8,10 @@ stayLooping: bool = True
 def on_click(x, y, button, pressed):
     global clickLog
     if (button == mouse.Button.left) and (not pressed):
-        if len(clickLog) < 2:
-            clickLog.append({x, y})
+        if len(clickLog) < 3:
+            clickLog.append((x, y))
         else:
-            print("Already recorded 2 points")
+            print("Already recorded 3 points")
 
 ms_listener = mouse.Listener(on_click=on_click)
     
@@ -21,7 +22,7 @@ def on_press(key):
         if not (ms_listener.is_alive()):
             ms_listener.start()
     elif (key == keyboard.Key.alt_l):
-        if len(clickLog) != 2:
+        if len(clickLog) != 3:
             print("Please finish calibrating")
         else:
             ms_listener.stop()
@@ -43,4 +44,8 @@ while stayLooping:
 kb_listener.stop()
 
 print(clickLog)
+
+px = ImageGrab.grab().load()
+for coord in clickLog:
+    print(px[coord[0], coord[1]], end="\t")
 

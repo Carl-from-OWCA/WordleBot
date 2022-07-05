@@ -1,7 +1,5 @@
-I decided to merge the calibration and solver into one
-class. I'm also hvaing all print statments print to a 
-stream so that I can have a driver class that can pass
-in a stream object to both the Bot class and the GUI 
-class. This way the two classes should be able to 
-read and write from the same thing while avoiding
-any global variables.
+I implemented a function that can type a word into 
+the keyboard and a function that can read the colors
+off the screen to record the results of an attempt.
+What I think I will need to work on now is improving
+calibration so that I can calibrate the colors as well.

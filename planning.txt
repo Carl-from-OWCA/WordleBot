@@ -9,21 +9,13 @@ Possible libraries for handling Keyboard + mouse input:
 * https://stackoverflow.com/questions/14368297/python-scope-inside-a-nested-function-inside-a-class
 
 
-Overall Process:
+Solver Algorithm:
 
-1) Startup
-    * GUI asks to Start
-    * Prompts to start calibration when ready
-2) Calibration:
-    * Ask user to click on top left and bottom right 
-      corners of the 6x5 wordle grid
-        * Need to press spacebar before and after to ignore 
-          clicks used for navigation
-    * Use that to obtain a rough idea of where each square is
-    * Color calibration: just approximate?
-3) Start running through guesses
+* Keep a list of which characters have been found to avoid
+  checking results from those squares in the future
+* Maybe keep a list of enums of colors to make stuff easier
 
-* Screw this, I'm gonna focus on the actual bot backend first,
-  then I'll worry about giving it a GUI and making it easy to use
-
-* Should calibration be a part of the bot or the driver?
+* Pick the word at the top of the remaining list
+* Make the keyboard type it into the game
+* Scan the pixels and determine the color for each box
+* Update list based on color of each box
