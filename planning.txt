@@ -7,6 +7,9 @@ Possible libraries for handling Keyboard + mouse input:
 * https://pypi.org/project/pynput/
 * https://pythonguides.com/python-tkinter-mainloop/
 * https://stackoverflow.com/questions/14368297/python-scope-inside-a-nested-function-inside-a-class
+* https://stackoverflow.com/questions/5218895/python-nested-functions-variable-scoping
+* https://stackoverflow.com/questions/1847092/given-an-rgb-value-what-would-be-the-best-way-to-find-the-closest-match-in-the-d
+* https://github.com/Kinkelin/WordleCompetition/blob/main/data/official/combined_wordlist.txt
 
 
 Solver Algorithm:

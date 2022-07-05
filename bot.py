@@ -1,17 +1,16 @@
 from pynput import mouse, keyboard
 from enum import Enum
 from PIL import ImageGrab
-import time
-import sys
-
-
-class Color(Enum):
-    Green = 1
-    Yellow = 2
-    Grey = 3
+import time, sys, csv
 
 
 class Bot:
+
+    class Color(Enum):
+        Green = 1
+        Yellow = 2
+        Grey = 3
+
 
     def __init__(self, ostream=sys.stdout) -> None:
         # Variables for external communication
@@ -25,7 +24,7 @@ class Bot:
 
         # Variables for internal communication (shared rd/wt)
         self.found_chars = [False for i in range(0, 5)]
-        self.attempt_result = [Color.Grey for i in range(0, 5)]
+        self.attempt_result = [Bot.Color.Grey for i in range(0, 5)]
         self.word_bank = [] # Read in from the CSV file
         
 
@@ -38,7 +37,18 @@ class Bot:
         calibration and load in previous calibration data.
         """
 
-        # First calibrate colors
+        print("Calibration starting up...", file=self.output_stream)
+        self._calibrateColors()
+        self._calibrateGrid()
+        
+
+
+    def _calibrateColors(self) -> None:
+        """
+        Helper function to handle color calibration. Encapsulating it as one function
+        makes it easier to improve the color calibration process later on.
+        """
+
         print("Calibrating: Colors\n"
               + "Click on the legend colors in the following order:\n"
               + "1) Green\n2) Yellow\n3) Grey"
@@ -49,7 +59,13 @@ class Bot:
         self.YELLOW = screenshot[clickLog[1][0], clickLog[1][1]]
         self.GREY = screenshot[clickLog[2][0], clickLog[2][1]]
 
-        # Then calibrate the grid
+
+    def _calibrateGrid(self) -> None:
+        """
+        Helper function to handle grid calibration. Encapsulating it as one function
+        makes it easier to improve the grid calibration process later on.
+        """
+
         print("Calibrating: Grid\n"
               + "Click on the top left corner of each square in the following pattern:\n"
               + "1) Left to Right\n2) Top to Bottom"
@@ -61,6 +77,14 @@ class Bot:
             self.grid_pixels.append([])
             for j in range(0, 5):
                 self.grid_pixels[i].append(clickLog.pop(0))
+
+    
+    def _loadCalibrationData(self) -> None:
+        pass
+
+
+    def _saveCalibrationData(self) -> None:
+        pass
 
 
     def _getXClicks(self, numClicks: int = 1) -> list[tuple]:
@@ -177,14 +201,14 @@ class Bot:
 
             if min_idx == 0:
                 # Green
-                self.attempt_result[i] = Color.Green
+                self.attempt_result[i] = Bot.Color.Green
                 self.found_chars[i] = True
             elif min_idx == 1:
                 # yellow
-                self.attempt_result[i] = Color.Yellow
+                self.attempt_result[i] = Bot.Color.Yellow
             else:
                 # grey
-                self.attempt_result[i] = Color.Grey
+                self.attempt_result[i] = Bot.Color.Grey
 
 
     def _updateWordBank(self, guessed: str) -> None:
@@ -202,9 +226,6 @@ class Bot:
         ensures that the bot is calibrated before it is run.
         """
 
+        print("Bot starting up...", file=self.output_stream)
         self.calibrate()
         self.solve()
-
-
-protoBot = Bot()
-protoBot.run()

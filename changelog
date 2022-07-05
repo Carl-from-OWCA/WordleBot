@@ -1,5 +1,3 @@
-Added in teh functionality to calibrate the colors. Next step
-will be to add functionality to allow to user to skip calibration
-and load/store calibration data into a file for future use.
-
-Also added in a lot of comments.
+Did some clean-up. Decided to move the Colors enum class
+inside the Bot class. Also split up the color calibration and 
+grid calibration into their own functions.
