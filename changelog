@@ -1,5 +1,5 @@
-I implemented a function that can type a word into 
-the keyboard and a function that can read the colors
-off the screen to record the results of an attempt.
-What I think I will need to work on now is improving
-calibration so that I can calibrate the colors as well.
+Added in teh functionality to calibrate the colors. Next step
+will be to add functionality to allow to user to skip calibration
+and load/store calibration data into a file for future use.
+
+Also added in a lot of comments.

@@ -19,3 +19,6 @@ Solver Algorithm:
 * Make the keyboard type it into the game
 * Scan the pixels and determine the color for each box
 * Update list based on color of each box
+
+I'm thinking I'll store the calibration data into a file and add an
+option to skip calibration and use saved data instead.
