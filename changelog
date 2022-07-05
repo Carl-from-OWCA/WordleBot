@@ -1,3 +1,1 @@
-Did some clean-up. Decided to move the Colors enum class
-inside the Bot class. Also split up the color calibration and 
-grid calibration into their own functions.
+Implemented teh save/load calibration data functions.

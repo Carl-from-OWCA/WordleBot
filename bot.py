@@ -15,12 +15,14 @@ class Bot:
     def __init__(self, ostream=sys.stdout) -> None:
         # Variables for external communication
         self.output_stream = ostream
+        self.word_bank = "word_bank.csv"
+        self.calibration_data = "calibration_data.csv"
 
         # Calibration & Setup
         self.grid_pixels: list[list[tuple]] = []
-        self.GREEN = None
-        self.YELLOW = None
-        self.GREY = None
+        self.GREEN = tuple()
+        self.YELLOW = tuple()
+        self.GREY = tuple()
 
         # Variables for internal communication (shared rd/wt)
         self.found_chars = [False for i in range(0, 5)]
@@ -80,11 +82,52 @@ class Bot:
 
     
     def _loadCalibrationData(self) -> None:
-        pass
+        """
+        This function pretty much does the opposite of `self._saveCalibrationData`. 
+        If that function gets updated, then this should be updated as well to 
+        follow the same encoding.
+        """
+
+        with open(self.calibration_data, newline='') as file:
+            reader = csv.reader(file)
+            # Get the colors
+            row = next(reader)
+            self.GREEN = tuple([int(elem) for elem in row])
+            row = next(reader)
+            self.YELLOW = tuple([int(elem) for elem in row])
+            row = next(reader)
+            self.GREY = tuple([int(elem) for elem in row])
+            # Load the coordinates into a list
+            temp = []
+            for row in reader:
+                coord = tuple([int(elem) for elem in row])
+                temp.append(coord)
+            # Reformat data into grid
+            self.grid_pixels.clear()
+            for i in range(0, 6):
+                self.grid_pixels.append([])
+                for j in range(0, 5):
+                    self.grid_pixels[i].append(temp.pop(0))
 
 
     def _saveCalibrationData(self) -> None:
-        pass
+        """
+        This function takes info from `self.grid_pixels`, and the calibration
+        data for the colors and stores them into an external CSV file. The first 
+        3 rows are the RGB codes for GREEN, YELLOW, GREY. Each of the following 
+        30 rows represent the (x, y) coordinates stored in `self.grid_pixels` 
+        from left to right, top to bottom.
+        """
+
+        with open(self.calibration_data, 'w', newline='') as file:
+            writer = csv.writer(file)
+            # write the color RGB Values
+            writer.writerows([self.GREEN, 
+                              self.YELLOW, 
+                              self.GREY])
+            # Write the pixel coordinates for the grid
+            for row in self.grid_pixels:
+                writer.writerows(row)
 
 
     def _getXClicks(self, numClicks: int = 1) -> list[tuple]:
@@ -122,6 +165,7 @@ class Bot:
                 else:
                     ms_listener.stop()
                     keepLooping = False
+                    return False
                 
         kb_listener = keyboard.Listener(on_press=on_press)
 
@@ -133,8 +177,7 @@ class Bot:
 
         # Stall so the other threads keep running
         while keepLooping:
-            pass
-        kb_listener.stop()
+            time.sleep(0.1) # make it work less
 
         return clickLog
 
