@@ -1,6 +1,7 @@
-So I've got a pretty rudimentary way of getting the 
-data for calibration working. I may or may not change
-the organizational structure of it (i.e. merging into
-the bot class or creating a new gui module and merging
-it with that. The use of global variables is also
-something I'll be thinking about.)
+I decided to merge the calibration and solver into one
+class. I'm also hvaing all print statments print to a 
+stream so that I can have a driver class that can pass
+in a stream object to both the Bot class and the GUI 
+class. This way the two classes should be able to 
+read and write from the same thing while avoiding
+any global variables.
