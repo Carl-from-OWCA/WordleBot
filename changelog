@@ -1,1 +1,4 @@
-Implemented teh save/load calibration data functions.
+__init__() function now loads in the word bank into the 
+object. Calibration can now be skipped and is fully working.
+(Will need to add a check to make sure Calibration
+CSV file is not empty)

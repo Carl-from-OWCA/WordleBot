@@ -15,8 +15,8 @@ class Bot:
     def __init__(self, ostream=sys.stdout) -> None:
         # Variables for external communication
         self.output_stream = ostream
-        self.word_bank = "word_bank.csv"
-        self.calibration_data = "calibration_data.csv"
+        self.word_bank_file = "word_bank.csv"
+        self.calibration_data_file = "calibration_data.csv"
 
         # Calibration & Setup
         self.grid_pixels: list[list[tuple]] = []
@@ -28,6 +28,11 @@ class Bot:
         self.found_chars = [False for i in range(0, 5)]
         self.attempt_result = [Bot.Color.Grey for i in range(0, 5)]
         self.word_bank = [] # Read in from the CSV file
+
+        with open(self.word_bank_file, newline="") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                self.word_bank.append(row[0])
         
 
     def calibrate(self) -> None:
@@ -39,11 +44,42 @@ class Bot:
         calibration and load in previous calibration data.
         """
 
-        print("Calibration starting up...", file=self.output_stream)
-        self._calibrateColors()
-        self._calibrateGrid()
-        
+        keepLooping = True
+        shouldCalibrate = True
 
+        def on_press(key):
+            nonlocal keepLooping, shouldCalibrate
+            if key == keyboard.Key.ctrl_l:
+                shouldCalibrate = True
+                keepLooping = False
+                return False
+            elif (key == keyboard.Key.alt_l):
+                shouldCalibrate = False
+                keepLooping = False
+                return False
+                
+        kb_listener = keyboard.Listener(on_press=on_press)
+
+        # Start the input monitors
+        print("Press 'ctrl' to start calibration (or)\n"
+              + "Press 'alt' to use saved calibration data.", file=self.output_stream)
+        kb_listener.start()
+
+        # Stall so the other threads keep running
+        while keepLooping:
+            time.sleep(0.1) # make it work less
+
+        # TO DO: Add check to make sure calibration data actually exists
+        if shouldCalibrate:
+            print("Calibration starting up...", file=self.output_stream)
+            self._calibrateColors()
+            self._calibrateGrid()
+            self._saveCalibrationData()
+            print("Calibration complete.", file=self.output_stream)
+        else:
+            print("Skipping Calibration...", file=self.output_stream)
+            self._loadCalibrationData()
+        
 
     def _calibrateColors(self) -> None:
         """
@@ -60,6 +96,7 @@ class Bot:
         self.GREEN = screenshot[clickLog[0][0], clickLog[0][1]]
         self.YELLOW = screenshot[clickLog[1][0], clickLog[1][1]]
         self.GREY = screenshot[clickLog[2][0], clickLog[2][1]]
+        print("Finished calibrating colors", file=self.output_stream)
 
 
     def _calibrateGrid(self) -> None:
@@ -79,6 +116,7 @@ class Bot:
             self.grid_pixels.append([])
             for j in range(0, 5):
                 self.grid_pixels[i].append(clickLog.pop(0))
+        print("Finished calibrating grid", file=self.output_stream)
 
     
     def _loadCalibrationData(self) -> None:
@@ -88,7 +126,7 @@ class Bot:
         follow the same encoding.
         """
 
-        with open(self.calibration_data, newline='') as file:
+        with open(self.calibration_data_file, newline='') as file:
             reader = csv.reader(file)
             # Get the colors
             row = next(reader)
@@ -119,7 +157,7 @@ class Bot:
         from left to right, top to bottom.
         """
 
-        with open(self.calibration_data, 'w', newline='') as file:
+        with open(self.calibration_data_file, 'w', newline='') as file:
             writer = csv.writer(file)
             # write the color RGB Values
             writer.writerows([self.GREEN, 
@@ -188,6 +226,10 @@ class Bot:
         is a bot that can submit guesses, read the results from the screen, and make
         a better guess the next time.
         """
+
+        print("To initiate the bot, click anywhere on the game window.\n"
+              + "Do not change or move windows while the bot is running.", file=self.output_stream)
+        self._getXClicks(1) # self.solve() will start immediately after
 
         guess = "salet"
         
