@@ -1,4 +1,2 @@
-__init__() function now loads in the word bank into the 
-object. Calibration can now be skipped and is fully working.
-(Will need to add a check to make sure Calibration
-CSV file is not empty)
+Changed the updating algo a little bit. I think it was the 
+YELLOW case that was causing issues.

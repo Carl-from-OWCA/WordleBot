@@ -25,3 +25,5 @@ Solver Algorithm:
 
 I'm thinking I'll store the calibration data into a file and add an
 option to skip calibration and use saved data instead.
+
+There seems to be a problem in how I'm updating the possible word bank.

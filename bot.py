@@ -235,22 +235,17 @@ class Bot:
         # First guess will be predetermined
         attempt_num = 0
 
-        guess = self.starting_guess
-        print("Guessing:", guess, file=self.output_stream)
-        self._sendKBInput(guess)
-        time.sleep(2.5) # give enough time for animations to finish
-        self._recordResults(attempt_num)
-        print(self.attempt_result)
-        self._updateWordBank(guess)
-        attempt_num += 1
-
         while ((False in self.found_chars) and (attempt_num < 6)):
-            guess = self.word_bank.pop()
+            if attempt_num == 0:
+                guess = self.starting_guess
+                self.word_bank.remove(guess)
+            else:
+                guess = self.word_bank.pop()
             print("Guessing:", guess, file=self.output_stream)
             self._sendKBInput(guess)
             time.sleep(2.5) # give enough time for animations to finish
             self._recordResults(attempt_num)
-            print(self.attempt_result)
+            print(self.attempt_result, file=self.output_stream)
             self._updateWordBank(guess)
             attempt_num += 1
         
@@ -322,34 +317,33 @@ class Bot:
         """
         
         for i in range(0, len(self.attempt_result)):
-            if self.found_chars[i]: 
-                continue    # prevent extra work
-            elif self.attempt_result[i] == Bot.Color.Green:
-                # remove all options where this char isn't in this position
+            if self.attempt_result[i] == Bot.Color.Green:
                 idx = 0
                 while idx < len(self.word_bank):
                     if self.word_bank[idx][i] != guessed[i]:
                         self.word_bank.pop(idx)
-                        idx -= 1
-                    idx += 1
-                self.found_chars[i] = True
+                        idx = idx - 1
+                    idx = idx + 1
             elif self.attempt_result[i] == Bot.Color.Yellow:
-                # remove all options where this char is in the word in this position
-                # or not in the word at all
                 idx = 0
                 while idx < len(self.word_bank):
-                    if ((self.word_bank[idx][i] == guessed[i]) 
-                        or (guessed[i] not in self.word_bank[idx])):
+                    if guessed[i] not in self.word_bank[idx]:
                         self.word_bank.pop(idx)
-                        idx -= 1
-                    idx += 1
+                        idx = idx - 1
+                    idx = idx + 1
+                idx = 0
+                while idx < len(self.word_bank):
+                    if self.word_bank[idx][i] == guessed[i]:
+                        self.word_bank.pop(idx)
+                        idx = idx - 1
+                    idx = idx + 1
             elif self.attempt_result[i] == Bot.Color.Grey:
                 idx = 0
                 while idx < len(self.word_bank):
                     if guessed[i] in self.word_bank[idx]:
                         self.word_bank.pop(idx)
-                        idx -= 1
-                    idx += 1
+                        idx = idx - 1
+                    idx = idx + 1
 
 
     def run(self) -> None:
