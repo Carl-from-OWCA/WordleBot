@@ -54,7 +54,7 @@ class Bot:
                 shouldCalibrate = True
                 keepLooping = False
                 return False
-            elif (key == keyboard.Key.alt_l):
+            elif (key == keyboard.Key.shift_l):
                 shouldCalibrate = False
                 keepLooping = False
                 return False
@@ -63,7 +63,7 @@ class Bot:
 
         # Start the input monitors
         print("Press 'ctrl' to start calibration (or)\n"
-              + "Press 'alt' to use saved calibration data.", file=self.output_stream)
+              + "Press 'shift' to use saved calibration data.", file=self.output_stream)
         kb_listener.start()
 
         # Stall so the other threads keep running
@@ -172,7 +172,7 @@ class Bot:
     def _getXClicks(self, numClicks: int = 1) -> list[tuple]:
         """
         The function handles getting mouse-input in an easy-to-use way. Simply press
-        `ctrl` to reset and begin logging clicks, and press `alt` to finish. The 
+        `ctrl` to reset and begin logging clicks, and press `shift` to finish. The 
         argument `numClicks` determines how many clicks it will force the user to 
         enter before it returns. Upon returning, it will return a list where each
         element is a tuple containing the `(x, y)` coordinates of each click made.
@@ -198,7 +198,7 @@ class Bot:
                 clickLog.clear()
                 if not (ms_listener.is_alive()):
                     ms_listener.start()
-            elif (key == keyboard.Key.alt_l):
+            elif (key == keyboard.Key.shift_l):
                 if len(clickLog) != numClicks:
                     print(numClicks, "points needed to finish calibration", file=self.output_stream)
                 else:
@@ -210,7 +210,7 @@ class Bot:
 
         # Start the input monitors
         print("Waiting for", numClicks, "click(s). Press the 'ctrl' key to\n"
-             + "start logging clicks or reset. Press the 'alt'\n"
+             + "start logging clicks or reset. Press the 'shift'\n"
              + "key to finish logging your clicks.", file=self.output_stream)
         kb_listener.start()
 
@@ -240,6 +240,7 @@ class Bot:
         self._sendKBInput(guess)
         time.sleep(2.5) # give enough time for animations to finish
         self._recordResults(attempt_num)
+        print(self.attempt_result)
         self._updateWordBank(guess)
         attempt_num += 1
 
@@ -249,6 +250,7 @@ class Bot:
             self._sendKBInput(guess)
             time.sleep(2.5) # give enough time for animations to finish
             self._recordResults(attempt_num)
+            print(self.attempt_result)
             self._updateWordBank(guess)
             attempt_num += 1
         
