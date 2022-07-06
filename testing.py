@@ -1,8 +1,3 @@
-import csv
+word = "hello"
 
-with open("word_bank.csv", newline="") as file:
-    reader = csv.reader(file)
-
-    for row in reader:
-        print(row[0])
-
+print(word[3])

@@ -23,6 +23,7 @@ class Bot:
         self.GREEN = tuple()
         self.YELLOW = tuple()
         self.GREY = tuple()
+        self.starting_guess = "salet"
 
         # Variables for internal communication (shared rd/wt)
         self.found_chars = [False for i in range(0, 5)]
@@ -231,16 +232,31 @@ class Bot:
               + "Do not change or move windows while the bot is running.", file=self.output_stream)
         self._getXClicks(1) # self.solve() will start immediately after
 
-        guess = "salet"
-        
-        # for attempt_num in range(0, 6):
-        #     # do the algorithm
-        #     pass
+        # First guess will be predetermined
+        attempt_num = 0
 
+        guess = self.starting_guess
+        print("Guessing:", guess, file=self.output_stream)
         self._sendKBInput(guess)
         time.sleep(2.5) # give enough time for animations to finish
-        self._recordResults(0)
-        print(self.attempt_result)
+        self._recordResults(attempt_num)
+        self._updateWordBank(guess)
+        attempt_num += 1
+
+        while ((False in self.found_chars) and (attempt_num < 6)):
+            guess = self.word_bank.pop()
+            print("Guessing:", guess, file=self.output_stream)
+            self._sendKBInput(guess)
+            time.sleep(2.5) # give enough time for animations to finish
+            self._recordResults(attempt_num)
+            self._updateWordBank(guess)
+            attempt_num += 1
+        
+        if False in self.found_chars:
+            print("Bot was unsuccessful", file=self.output_stream)
+        else:
+            print("Bot was successful; solution:", guess, file=self.output_stream)
+
     
 
     def _sendKBInput(self, word: str) -> None:
@@ -302,7 +318,36 @@ class Bot:
         (passed as `guessed`) and the state of `self.attempt_result`. It also uses
         `attempt.found_chars` to reduce the amount of work it has to do.
         """
-        pass
+        
+        for i in range(0, len(self.attempt_result)):
+            if self.found_chars[i]: 
+                continue    # prevent extra work
+            elif self.attempt_result[i] == Bot.Color.Green:
+                # remove all options where this char isn't in this position
+                idx = 0
+                while idx < len(self.word_bank):
+                    if self.word_bank[idx][i] != guessed[i]:
+                        self.word_bank.pop(idx)
+                        idx -= 1
+                    idx += 1
+                self.found_chars[i] = True
+            elif self.attempt_result[i] == Bot.Color.Yellow:
+                # remove all options where this char is in the word in this position
+                # or not in the word at all
+                idx = 0
+                while idx < len(self.word_bank):
+                    if ((self.word_bank[idx][i] == guessed[i]) 
+                        or (guessed[i] not in self.word_bank[idx])):
+                        self.word_bank.pop(idx)
+                        idx -= 1
+                    idx += 1
+            elif self.attempt_result[i] == Bot.Color.Grey:
+                idx = 0
+                while idx < len(self.word_bank):
+                    if guessed[i] in self.word_bank[idx]:
+                        self.word_bank.pop(idx)
+                        idx -= 1
+                    idx += 1
 
 
     def run(self) -> None:
@@ -314,3 +359,4 @@ class Bot:
         print("Bot starting up...", file=self.output_stream)
         self.calibrate()
         self.solve()
+        print("Bot shutting down...", file=self.output_stream)
