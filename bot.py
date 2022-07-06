@@ -76,7 +76,7 @@ class Bot:
             self._calibrateColors()
             self._calibrateGrid()
             self._saveCalibrationData()
-            print("Calibration complete.", file=self.output_stream)
+            print("Calibration complete", file=self.output_stream)
         else:
             print("Skipping Calibration...", file=self.output_stream)
             self._loadCalibrationData()
@@ -232,6 +232,8 @@ class Bot:
               + "Do not change or move windows while the bot is running.", file=self.output_stream)
         self._getXClicks(1) # self.solve() will start immediately after
 
+        print("Bot initiated, starting to think...", file=self.output_stream)
+
         # First guess will be predetermined
         attempt_num = 0
 
@@ -245,14 +247,14 @@ class Bot:
             self._sendKBInput(guess)
             time.sleep(2.5) # give enough time for animations to finish
             self._recordResults(attempt_num)
-            print(self.attempt_result, file=self.output_stream)
+            # print(self.attempt_result, file=self.output_stream)
             self._updateWordBank(guess)
             attempt_num += 1
         
         if False in self.found_chars:
             print("Bot was unsuccessful", file=self.output_stream)
         else:
-            print("Bot was successful; solution:", guess, file=self.output_stream)
+            print("Bot was successful - solution:", guess, file=self.output_stream)
 
     
 
@@ -313,11 +315,12 @@ class Bot:
         """
         This function updates the word bank based on the last guess that was made
         (passed as `guessed`) and the state of `self.attempt_result`. It also uses
-        `attempt.found_chars` to reduce the amount of work it has to do.
+        `attempt.found_chars` for the GREY case.
         """
         
         for i in range(0, len(self.attempt_result)):
             if self.attempt_result[i] == Bot.Color.Green:
+                # remove words without green letter in same spot
                 idx = 0
                 while idx < len(self.word_bank):
                     if self.word_bank[idx][i] != guessed[i]:
@@ -325,12 +328,14 @@ class Bot:
                         idx = idx - 1
                     idx = idx + 1
             elif self.attempt_result[i] == Bot.Color.Yellow:
+                # remove word with yellow letter in same spot
                 idx = 0
                 while idx < len(self.word_bank):
                     if guessed[i] not in self.word_bank[idx]:
                         self.word_bank.pop(idx)
                         idx = idx - 1
                     idx = idx + 1
+                # remove words without yellow letter at all
                 idx = 0
                 while idx < len(self.word_bank):
                     if self.word_bank[idx][i] == guessed[i]:
@@ -338,13 +343,37 @@ class Bot:
                         idx = idx - 1
                     idx = idx + 1
             elif self.attempt_result[i] == Bot.Color.Grey:
+                # remove words with grey letter in same spot
                 idx = 0
                 while idx < len(self.word_bank):
-                    if guessed[i] in self.word_bank[idx]:
+                    if self.word_bank[idx][i] == guessed[i]:
                         self.word_bank.pop(idx)
                         idx = idx - 1
                     idx = idx + 1
-
+                # Record unfound indices
+                unfounds = []
+                for j in range(0, len(self.found_chars)):
+                    if not self.found_chars[j]: 
+                        unfounds.append(j)
+                # Count yellow occurrences of guessed[i]:
+                yellow_count = 0
+                for j in unfounds:
+                    if ((guessed[j] == guessed[i]) 
+                        and (self.attempt_result[j] == Bot.Color.Yellow)):
+                        yellow_count = yellow_count + 1
+                # remove words with more/less than yellow_count occurrences 
+                # of guessed[i] within the indices stored in unfounds
+                idx = 0
+                while idx < len(self.word_bank):
+                    found_letters = 0
+                    for j in unfounds:
+                        if self.word_bank[idx][j] == guessed[i]:
+                            found_letters = found_letters + 1
+                    if found_letters != yellow_count:
+                        self.word_bank.pop(idx)
+                        idx = idx - 1
+                    idx = idx + 1
+                
 
     def run(self) -> None:
         """

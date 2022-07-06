@@ -27,3 +27,52 @@ I'm thinking I'll store the calibration data into a file and add an
 option to skip calibration and use saved data instead.
 
 There seems to be a problem in how I'm updating the possible word bank.
+Still seems to be a little bit buggy. Sometimes it'll just end up
+with an empty list all of a sudden. Okay, the problem is coming from
+repeating characters I think. For example, just because the second C 
+in Chase is grey, it got rid of all options that had a C anywhere, even 
+though a C in the first place is correct. So I need to fix how I handle
+the grey case. So if I make a guess where a letter is repeated, and each
+occurrence is a different color, I run into problems.
+
+Grey does not mean the letter is not in the word. It means there are no
+MORE of those letters in the word.
+
+If there is only one occurrence of the letter in the target word, and a 
+guess has multiple occurrences of that letter, but all in the wrong spot,
+only one of those occurrences will be marked yellow, while the others will
+be marked grey.
+
+So, grey means there are no more occurrences of the letter aside from any 
+green occurrences. The number of yellow squares shows how many occurrences
+besides the green are remaining.
+
+SO on a grey square, only inspect based on the spots which have not 
+been found already.
+
+Think of the target being "amuse" and guessing "sleep":
+https://wordlegame.org/?challenge=YW11c2U
+
+"AMUSE" is a great test case target
+
+Possible algo for grey case:
+* Lets say that i letter in guess was grey
+* remove all words that have guess[i] in their i spot
+* then remove all words that have more total occurrences of
+  guess[i] than the number of Green + yellow squares with guess[i]
+
+Revised algo:
+1) Lets say that i letter in guess was grey
+2) remove all words that have guess[i] in their i spot
+3) In teh word bank, only look at indices for which a letter
+  hasn;t already been found
+4) Within these spots, if the total number of occurrences of guess[i]
+   is greater than the number of yellow blocks that had guess[i], remove
+   that word
+
+* NOTE: when a guess has multiple occurrences of a letter (all in the
+  wrong spot) then only the first n will be yellow where n is the number
+  of occurrences of that letter in the target word that haven't yet been 
+  found. The rest will be grey. So by the time I am on a GREY case, I will
+  have already removed all words from the bank that have that letter in 
+  teh yellow spot. Because of this, step 4 in the above algo should be correct

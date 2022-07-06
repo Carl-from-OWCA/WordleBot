@@ -1,2 +1,8 @@
-Changed the updating algo a little bit. I think it was the 
-YELLOW case that was causing issues.
+NVM, it was the GREY case that was causing issues. I thought
+it was the easiest case, even though it ended up being the 
+most complex case to handle. 
+
+And things do seem to be working. The algorithm is not looking
+and word popularity or anything, so it could probably be 
+improved. For example, it took all 6 tries to get "FLUFF".
+And it couldn't even get "CREED".
