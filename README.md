@@ -5,6 +5,9 @@ This is a bot that can play wordle for you on your computer. It will be able to 
 
 If you plan on running this bot on multiple different interfaces, I recommend saving a copy of the "calibration_data.csv" file in a separate folder with some indication of what specific interface it's for. Then when you want to switch interfaces (ie, go from NYT to wordlegame.org), simply take the "calibration_data.csv" file corresponding to that interface and move it back into the folder with the Python scripts.
 
+How to use:
+* Run the `driver.py` file and follow the prompts
+
 Requirements:
 * Python 3
 * pynput (library)
